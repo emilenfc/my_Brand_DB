@@ -1,0 +1,34 @@
+{
+  "scripts": {
+    "start": "nodemon app.js",
+    "test": "mocha",
+    "type":"module"
+    
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "chai": "^4.3.7",
+    "chai-http": "^4.3.0",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.8.0",
+    "nodemon": "^2.0.20",
+    "swagger-jsdoc": "^6.2.7",
+    "swagger-ui-express": "^4.6.0",
+    "validator": "^13.7.0"
+  },
+  "devDependencies": {
+    "mocha": "^10.2.0",
+    "supertest": "^6.3.3"
+  },
+  "name": "mybakend",
+  "version": "1.0.0",
+  "description": "This is my backend web",
+  "main": "app.js",
+  "directories": {
+    "test": "test"
+  },
+  "author": "Iyadukunze Emile",
+  "license": "ISC"
+}
