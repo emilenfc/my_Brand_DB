@@ -76,7 +76,7 @@ app.use(routes)
 mongoose
 	.connect("mongodb://localhost:27017/MyBrandfDB", { useNewUrlParser: true })
 	.then(async () => {
-		await app.listen(process.env.4000, () => { //here changed by adding process.env.PORT
+		await app.listen(4000, () => { //here changed by adding process.env.PORT
 			console.log("Emile, your Server has started on port 4000!")
 			swaggerDocs(app, 4000)
 		})
