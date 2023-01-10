@@ -74,7 +74,7 @@ app.use(cookieParser())
 app.use(routes)
 
 mongoose
-	.connect("mongodb://localhost:27017/MyBrandfDB", { useNewUrlParser: true })
+	.connect("mongodb+srv://Emile:KwaNgujezcHJkvEf@cluster0.ancg36w.mongodb.net/MyBrandfDB?retryWrites=true&w=majority", { useNewUrlParser: true })
 	.then(async () => {
 		await app.listen(4000, () => { //here changed by adding process.env.PORT
 			console.log("Emile, your Server has started on port 4000!")
