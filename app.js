@@ -76,9 +76,9 @@ app.use(routes)
 mongoose
 	.connect("mongodb+srv://Emile:KwaNgujezcHJkvEf@cluster0.ancg36w.mongodb.net/MyBrandfDB?retryWrites=true&w=majority", { useNewUrlParser: true })
 	.then(async () => {
-		await app.listen(4000, () => { //here changed by adding process.env.PORT
-			console.log("Emile, your Server has started on port 4000!")
-			swaggerDocs(app, 4000)
+		await app.listen("mongodb+srv://Emile:KwaNgujezcHJkvEf@cluster0.ancg36w.mongodb.net/MyBrandfDB?retryWrites=true&w=majority", () => { //here changed by adding process.env.PORT
+			console.log("Your Server has started on port 4000!")
+			swaggerDocs(app, "mongodb+srv://Emile:KwaNgujezcHJkvEf@cluster0.ancg36w.mongodb.net/MyBrandfDB?retryWrites=true&w=majority")
 		})
 	}).catch((err) => {
 		console.log(err)
