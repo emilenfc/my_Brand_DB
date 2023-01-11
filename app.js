@@ -41,7 +41,7 @@ const options = {
 		  ],
 		servers:[
 			{
-				url:"mongodb+srv://Emile:KwaNgujezcHJkvEf@cluster0.ancg36w.mongodb.net/MyBrandfDB?retryWrites=true&w=majority"
+				url:"https://good-red-cougar-hem.cyclic.app"
 			}
 		],
 		
