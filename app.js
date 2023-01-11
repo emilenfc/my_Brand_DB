@@ -41,7 +41,7 @@ const options = {
 		  ],
 		servers:[
 			{
-				url:"http://localhost:4000"
+				url:"mongodb+srv://Emile:KwaNgujezcHJkvEf@cluster0.ancg36w.mongodb.net/MyBrandfDB?retryWrites=true&w=majority"
 			}
 		],
 		
