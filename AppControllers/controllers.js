@@ -496,3 +496,38 @@ module.exports.postMessage = (req, res) => {
         }
     })
 }
+
+
+/// for user subscribing
+
+
+const Subscribe = mongoose.model('Subscribe', {
+    email: {
+        type: String,
+        required: [true, 'Please enter your emaail'],
+    },
+});
+
+module.exports.postSubscribe = (req, res) =>{
+    const newSubscribe = new Subscribe({
+    email: req.body.email
+    })
+    newSubscribe.save((err,message)=>{
+    if (err) {
+            res.status(500).send(err)
+        } else {
+            res.status(201).send({ message: "Subscribed Succesfull" })
+        }
+    })
+    }
+
+/// admin can get all messages
+module.exports.getSubscribe = (req, res) => {
+    Subscribe.find({}, (err, message) => {
+        if (err) {
+            res.status(500).send(err);
+        } else {
+            res.status(200).send(message);
+        }
+    })
+}
