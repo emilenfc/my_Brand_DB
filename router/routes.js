@@ -436,6 +436,46 @@ router.post("/sendMessage", controllers.postMessage)
 
 
 /**
+ * @openapi
+ * /subscribe:
+ *   post:
+ *     summary: get weekely update
+ *     operationId: subscribe
+ *     tags:
+ *       - SUBSCRIBE
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Subscribe'
+ *     responses:
+ *       '201':
+ *         description: Success subscribed
+ */
+router.post("/subscribe", checkUser, controllers.postSubscribe)
+/**
+ * @openapi
+ * '/getSubscriber':
+ *   get:
+ *     summary: Get all subscribers
+ *     operationId: getSubscribers
+ *     tags:
+ *       - SUBSCRIBE
+ *     responses:
+ *       '200':
+ *         description: Successfull
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Subscribe'
+ *       '401':
+ *         description: Unauthorized(this is Admin operation)
+ */
+router.get("/getSubscriber", requireAuth, controllers.getSubscribe)
+/**
  * components:
  *   schemas:
  *     user:
@@ -548,8 +588,16 @@ router.post("/sendMessage", controllers.postMessage)
  *       example:
  *        Names: "John Smith"
  *        Comment: "This is a great blog post!"
- *        blog_id: "5f14b0e7e1675c5d9f982b12"
- *        user_id: "5f14b0e7e1675c5d9f982b13"
+ */
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     Subscribe:
+ *       type: object
+ *       properties:
+ *         email:
+ *           type: string
  */
 
 
