@@ -476,6 +476,25 @@ router.post("/subscribe", checkUser, controllers.postSubscribe)
  */
 router.get("/getSubscriber", requireAuth, controllers.getSubscribe)
 /**
+ * @openapi
+ * '/dltAllsubscribers':
+ *    delete:
+ *      summary: delete all blog
+ *      tags: [SUBSCRIBE]
+ *      description: delete all subscribers from our database
+ *      responses:
+ *        200:
+ *          description: All subscribers are deleted
+ *        401:
+ *          description: Unauthorized(this is Admin operation)
+ */
+router.delete('/dltAllsubscribers', requireAuth, controllers.deleteAllSubscribers)
+
+
+
+
+
+/**
  * components:
  *   schemas:
  *     user:
