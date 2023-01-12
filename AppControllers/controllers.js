@@ -498,28 +498,40 @@ module.exports.postMessage = (req, res) => {
 }
 
 
+
 /// for user subscribing
-
-
 const Subscribe = mongoose.model('Subscribe', {
     email: {
         type: String,
-        required: [true, 'Please enter your emaail'],
+        required: [true, 'Please enter your email'],
+        unique: true
     },
 });
 
-module.exports.postSubscribe = (req, res) =>{
-    const newSubscribe = new Subscribe({
-    email: req.body.email
-    })
-    newSubscribe.save((err,message)=>{
-    if (err) {
-            res.status(500).send(err)
+module.exports.postSubscribe = async (req, res) => {
+    try {
+        const newSubscribe = new Subscribe({
+            email: req.body.email
+        })
+
+        let subscribed = await Subscribe.findOne({ email: newSubscribe.email });
+        if (subscribed) {
+            res.send("Email already subscribed");
         } else {
-            res.status(201).send({ message: "Subscribed Succesfull" })
+            newSubscribe.save((err, message) => {
+                if (err) {
+                    res.status(500).send(err)
+                } else {
+                    res.status(201).send({ message: "Subscribed Succesfull" })
+                }
+            });
         }
-    })
+    } catch (err) {
+        res.status(500).send(err)
     }
+}
+
+
 
 /// admin can get all messages
 module.exports.getSubscribe = (req, res) => {
@@ -530,4 +542,13 @@ module.exports.getSubscribe = (req, res) => {
             res.status(200).send(message);
         }
     })
+}
+module.exports.deleteAllSubscribers = (req, res) => {
+    Subscribe.deleteMany({}, (err) => {
+        if (err) {
+            res.status(500).send(err);
+        } else {
+            res.status(200).send({ message: "All subscribers have been successfully deleted" });
+        }
+    });
 }
