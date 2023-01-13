@@ -311,42 +311,43 @@ module.exports.deleteAllBlogs = async (req, res) => {
 //comment on blog
 //BlogComment
 
+
 module.exports.createComment = async (req, res) => {
     let blog_id = req.params[0];
-  
-    if (!mongoose.Types.ObjectId.isValid(blog_id)) {
-      return res.status(400).send({
-        message: "Invalid blog id",
-        data: {}
-      });
+
+    if (!mongoose.Types.ObjectId.isValid(req.params.blog_id)) {
+        return res.status(400).send({
+            message: "Invalid blog id",
+            data: {}
+        });
     }
-    await BlogsSchema.findOne({ _id: blog_id }).then(async (blog) => {
+    await BlogsSchema.findById(req.params.blog_id).then(async (blog) => {
+        console.log(req.params)
+        console.log(req.body)
         if (!blog) {
             return res.status(400).send({
                 message: "No Blog found",
                 data: {}
             });
+
         } else {
             try {
                 // Code to create a new comment and save it to the database here
                 let comment = new BlogComment({
-                    Names: req.body.names,
-                    Comment: req.body.comment,
+                    Names: req.body.Names,
+                    Comment: req.body.Comment,
                     blog_id: blog_id
                     // Set properties for the new comment here
                 });
+                console.log(comment)
                 let commentData = await comment.save();
-                await BlogsSchema.updateOne(
-                    { _id: blog_id },
-                    {
-                        $push: {
-                            blog_comments: {
-                                Names: commentData.Names,
-                                Comment: commentData.Comment
-                            }
-                        }
-                    }
+
+                let newOne = await BlogsSchema.findById(
+                    req.params.blog_id,
                 )
+
+                newOne.blog_comments.push(commentData)
+                await newOne.save();
 
                 return res.status(200).send({
                     message: "Comment successfully added",
