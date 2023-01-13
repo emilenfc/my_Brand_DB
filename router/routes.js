@@ -318,39 +318,24 @@ router.get("/Blogs", checkUser, controllers.allBlogs)
 /**
  * @openapi
  * /comments/:blog_id:
- *     post:
- *       tags: [User activities]
- *       summary: create a new comment
- *       parameters:
- *         - name: blog_id
- *           in: path
- *           description: The unique id of the blog
- *           required: true      
- *       requestBody:
- *         description: please fill all required fields
- *         required: true
- *         content:
- *          application/json:
+ *   post:
+ *     summary: update a blog post only admin can update
+ *     tags: [User activities]
+ *     parameters:
+ *      - name: blog_id
+ *        in: path
+ *        description: provide blogId
+ *        required: true
+ *     requestBody:
+ *       description: please fill all required fields
+ *       required: true
+ *       content:
+ *         application/json:
  *           schema:
- *            $ref: '#/components/schemas/blogComment'
- *       responses:
- *         200:
- *           description: Successfully created new comment
- *
- *         400:
- *           description: Invalid blog ID or other error occurred
- *           content:
- *            application/json:
- *             schema:
- *               type: object
- *               properties:
- *                message:
- *                  type: string
- *                  description: Error message
- *                data:
- *                  type: object
- *                  description: Error object
- *
+ *             $ref: '#/components/schemas/blogComment'
+ *     responses:
+ *       '201':
+ *         description: Commented successfuly
  */
 
 router.post("/comments/:blog_id", checkUser, controllers.createComment)
