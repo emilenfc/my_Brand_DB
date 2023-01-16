@@ -97,6 +97,22 @@ describe("ADMIN bLOG CRUD TESTS", () => {
             done();
           });
       });
+      it('Testing DELETE ONE "/deleteOneBlog/:id"', (done) => {
+        chai
+          .request(app)
+          .delete('/deleteOneBlog/63a154066e166cf15da44031')
+          .set('Cookie', token)
+          .end((err, res) => {
+            if (err) console.err(err)
+                  res.body.should.be.a('object')
+            res.body.should.have
+              .property('message')
+              .eql('Deleted Successfully')
+        res.body.should.have.property('message')
+            done()
+   })
+      })
+    })
     });
  // let id;
     // beforeEach((done) => {
