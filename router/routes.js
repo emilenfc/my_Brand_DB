@@ -3,6 +3,7 @@ const router = express.Router()
 const controllers = require('../AppControllers/controllers')
 const { requireAuth, checkUser } = require('../middlerware/middleware')
 
+
 /////////////home page 
 /**
  * @openapi
@@ -54,7 +55,7 @@ router.post('/adminRegister', controllers.adminRegister)
 *       content:
 *         application/json:
 *           schema:
-*             $ref: '#/components/schemas/user'
+*             $ref: '#/components/schemas/userUser'
 *     responses:
 *       '200':
 *         description: successfully account created
@@ -131,16 +132,16 @@ router.get('/getAllUsers', requireAuth, controllers.allUsers)
 
 /////////////Delete one user
 /**
- * @openapi
-* "/deleteOneUser/:id":
+* @openapi
+* "/deleteOneUser/{id}":
 *   delete:
 *      tags: [Admin Operation]
 *      summary: delete one user
 *      parameters:
 *        - name: id
 *          in: path
-*          description: provide The unique id of the user
 *          required: true
+*          description: provide The unique id of the user
 *      responses:
 *        200:
 *          description: successfull user deleted
@@ -181,35 +182,31 @@ router.delete('/deleteAllUser', requireAuth, controllers.deleteAllUser)
  *        200:
  *          description: blogs get all blogs from our api
  */
-router.get("/allBlogs", requireAuth, controllers.allBlogs)
+router.get("/allBlogs", controllers.allBlogs)
 
 /////////////Get individual blog TEST :
 /**
  * @openapi
- * "/blog/{id}":
+ * /blog/{id}:
  *    get:
  *      tags: [Admin Operation]
- *      summary: Get one blog
- *      description: returns a one blog should provide blog id from our database
+ *      summary: get comment
  *      parameters:
- *        - name: blog id
- *          in: path
- *          description: provide blogId
- *          required: true
+ *         - name: "id"
+ *           in: path
+ *           type: string
+ *           required: true
+ *           description: provide blogId
  *      responses:
  *        200:
  *          description: success
- *          content:
- *            type: object
- *            application/json:
- *              schema:
- *                $ref: '#/components/schemas/blog'
- *        404:
- *          description: not found
+ *        400:
+ *          description: invalid request
+ *        401:
+ *          descriprion: Unauthorized
  */
 
-
-router.get("/blog/:id", requireAuth, controllers.getOneBlog)
+router.get("/blog/:id", controllers.getOneBlog)
 
 /////////////Create a blog
 /**
@@ -234,16 +231,16 @@ router.post("/createBlog", requireAuth, controllers.createBlog)
 /////////////Update a blog (patch or edit)
 /**
  * @openapi
- * /updateBlog/:id:
+ * /updateBlog/{id}:
  *   patch:
  *     summary: update a single blog
  *     description: only admin can update
  *     tags: [Admin Operation]
  *     parameters:
- *      - name: id
+ *      - name: "id"
  *        in: path
- *        description: provide blogId
  *        required: true
+ *        description: provide blogId
  *     requestBody:
  *       description: please fill all required fields
  *       required: true
@@ -260,13 +257,13 @@ router.patch("/updateBlog/:id", requireAuth, controllers.updateBlog)
 /////////////Delete a single blog 
 /**
  * @swagger
- * /deleteOneBlog/:id:
+ * /deleteOneBlog/{id}:
  *    delete:
  *      summary: delete one blog.
  *      tags: [Admin Operation]
  *      description: deleting a one blog, should provide blog id from our database
  *      parameters:
- *        - name: id
+ *        - name: "id"
  *          in: path
  *          description: provide blogId
  *          required: true
@@ -286,7 +283,7 @@ router.delete("/deleteOneBlog/:id", requireAuth, controllers.deleteOneBlog)
 /**
  * @openapi
  * '/deleteAllBlogs':
- *    get:
+ *    delete:
  *      summary: delete all blog
  *      tags: [Admin Operation]
  *      description: delete all blogs from our database
@@ -312,46 +309,96 @@ router.delete("/deleteAllBlogs", requireAuth, controllers.deleteAllBlogs)
  *        406:
  *          description: login first to get blogs
  */
-router.get("/Blogs", checkUser, controllers.allBlogs)
+router.get("/Blogs", controllers.allBlogs)
 
 /////////////////////////comments
 /**
  * @openapi
- * /comments/:blog_id:
- *   post:
- *     summary: update a blog post only admin can update
- *     tags: [User activities]
- *     parameters:
- *      - name: blog_id
- *        in: path
- *        description: provide blogId
- *        required: true
- *     requestBody:
- *       description: please fill all required fields
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/blogComment'
- *     responses:
- *       '201':
- *         description: Commented successfuly
+ * /comments/{blog_id}:
+ *    post:
+ *      tags: [Blog Comment]
+ *      summary: Add a new comment
+ *      parameters:
+ *         - name: "blog_id"
+ *           in: path
+ *           type: string
+ *           required: true
+ *           description: provide blogId
+ *      requestBody:
+ *         required: true
+ *         content:
+ *            application/json:
+ *              schema:
+ *                $ref: '#/components/schemas/blogComment'
+ *      responses:
+ *        200:
+ *          description: success
+ *        400:
+ *          description: invalid request
+ *        401:
+ *          descriprion: Unauthorized
  */
 
 router.post("/comments/:blog_id", checkUser, controllers.createComment)
+/**
+ * @openapi
+ * /blogComments/{blog_id}:
+ *    get:
+ *      tags: [Blog Comment]
+ *      summary: get comment
+ *      parameters:
+ *         - name: "blog_id"
+ *           in: path
+ *           type: string
+ *           required: true
+ *           description: provide blogId
+ *      responses:
+ *        200:
+ *          description: success
+ *        400:
+ *          description: invalid request
+ *        401:
+ *          descriprion: Unauthorized
+ */
+
+
+router.get("/blogComments/:blog_id", controllers.getBlogComments)
+/**
+ * @openapi
+ * '/getAllCommetsofAllBlogs':
+ *   get:
+ *     summary: Get all CommentsofAllBlogs
+ *     operationId: getAllCommetsofAllBlogs
+ *     tags:
+ *       - Blog Comment
+ *     responses:
+ *       '200':
+ *         description: Successfull
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *       '401':
+ *         description: Unauthorized(this is Admin operation)
+ */
+router.get("/getAllCommetsofAllBlogs",requireAuth, controllers.getAllCommetsofAllBlogs)
+
+
 //////////////////////// like and unlike
 /**
  * @openapi
- * "/:blog_id/like":
+ * "/like/{blog_id}":
  *    post:
  *      summary: like a blog
  *      tags: [User activities]
  *      parameters:
- *        - name: blog_id
- *          in: path
- *          type: string
- *          description: provide The unique id of the blog
- *          required: true
+ *         - name: "blog_id"
+ *           in: path
+ *           type: string
+ *           required: true
+ *           description: provide The unique id of the blog
+ *           schema:
+ *            type: "string"
  *      responses:
  *        200:
  *          description: successfull liked
@@ -370,8 +417,8 @@ router.post("/comments/:blog_id", checkUser, controllers.createComment)
  *                   description: Error object
  */
 
-router.post("/:blog_id/like", checkUser, controllers.like)
-
+router.post("/like/:blog_id", checkUser, controllers.like)
+router.get("/allikes/:blog_id", controllers.getBloglikes)
 /**
  * @openapi
  * '/userMessage':
@@ -399,7 +446,7 @@ router.get("/userMessage", requireAuth, controllers.getMessage)
  * @openapi
  * /sendMessage:
  *   post:
- *     summary: Create a new message
+ *     summary: create a new message
  *     operationId: createMessage
  *     tags:
  *       - USER Messages
@@ -418,7 +465,33 @@ router.get("/userMessage", requireAuth, controllers.getMessage)
  *               $ref: '#/components/schemas/Message'
  */
 router.post("/sendMessage", controllers.postMessage)
+//63ccceecab4f5e0b45903cbe
+/**
+ * @openapi
+ * /deleteMessage/{id}:
+ *    delete:
+ *      summary: delete one message.
+ *      tags: [USER Messages]
+ *      description: deletes a message by providing its id
+ *      parameters:
+ *        - name: "id"
+ *          in: "path"
+ *          required: true
+ *          description: The id of the message to delete
+ *          schema:
+ *            type: "string"
+ *      responses:
+ *        200:
+ *          description: success deleted
+ *        400:
+ *          description: Invalid message id provided
+ *        404:
+ *          description: Message not found
+ *        500:
+ *          description: Internal server error
+ */
 
+router.delete("/deleteMessage/:id", requireAuth,controllers.deleteMessage)
 
 /**
  * @openapi
@@ -475,24 +548,46 @@ router.get("/getSubscriber", requireAuth, controllers.getSubscribe)
  */
 router.delete('/dltAllsubscribers', requireAuth, controllers.deleteAllSubscribers)
 
-
-
-
-
 /**
- * components:
- *   schemas:
- *     user:
- *       type: object
- *       properties:
- *         email:
- *           type: string
- *           required:true
- *         password:
- *           type: string
- *           required: true
- *           
+ * @openapi
+ * /deleteOneSubscriber/{id}:
+ *    delete:
+ *      summary: delete one subscriber.
+ *      tags: [SUBSCRIBE]
+ *      description: deletes a message by providing its id
+ *      parameters:
+ *        - name: "id"
+ *          in: "path"
+ *          required: true
+ *          description: The id of the message to delete
+ *          schema:
+ *            type: "string"
+ *      responses:
+ *        200:
+ *          description: success deleted
+ *        400:
+ *          description: Invalid id provided
+ *        404:
+ *          description: Subscriber not found
+ *        500:
+ *          description: Internal server error
  */
+
+router.delete("/deleteOneSubscriber/:id", requireAuth,controllers.deleteOneSubscribers)
+// /**
+//  * components:
+//  *   schemas:
+//  *     user:
+//  *       type: object
+//  *       properties:
+//  *         email:
+//  *           type: string
+//  *           required:true
+//  *         password:
+//  *           type: string
+//  *           required: true
+//  *           
+//  */
 
 /**
  * @openapi
@@ -514,6 +609,39 @@ router.delete('/dltAllsubscribers', requireAuth, controllers.deleteAllSubscriber
  *        email: youremail@gmail.com
  *        password: Pass@123 
  */
+
+
+/**
+ * @openapi
+ * components:
+ *  schemas:
+ *    userUser:
+ *      type: object
+ *      required:
+ *        - firstName
+ *        - secondName
+ *        - phone
+ *        - email
+ *        - password
+ *      properties:
+ *        firstName:
+ *          type: string
+ *        secondName:
+ *          type: string
+ *        phone:
+ *          type: string
+ *        email:
+ *          type: string
+ *        password:
+ *          type: string
+ *      example:
+ *        firstName: Kamana
+ *        secondName: Eric
+ *        phone: '0780000000'
+ *        email: youremail@gmail.com
+ *        password: Pass@123 
+ */
+
 /**
  * @openapi
  *components:
@@ -522,16 +650,18 @@ router.delete('/dltAllsubscribers', requireAuth, controllers.deleteAllSubscriber
  *      type: object
  *      required:
  *        - title
- *        - content
- *        - imageUlr
+ *        - text
+ *        - image
  *        - author
  *      properties:
  *        title:
  *          type: string
- *        content:
+ *        author:
+ *          type: string
+ *        text:
  *          type: string
 
- *        imageUlr:
+ *        image:
  *          type: string
  */
 /**
@@ -542,16 +672,22 @@ router.delete('/dltAllsubscribers', requireAuth, controllers.deleteAllSubscriber
  *      type: object
  *      required:
  *        - title
- *        - content
- *        - imageUlr
+ *        - author
+ *        - text
+ *        - image
  *      properties:
  *        title:
  *          type: string
- *        content:
+ *        author:
  *          type: string
- *        imageUlr:
+ *        text:
+ *          type: string
+ *        image:
+ *          type: string
+ *        Time:
  *          type: string
  */
+
 
 /**
  * @openapi
@@ -560,38 +696,63 @@ router.delete('/dltAllsubscribers', requireAuth, controllers.deleteAllSubscriber
  *     Message:
  *       type: object
  *       properties:
+ *         date:
+ *           type: string
+ *         Time:
+ *           type: string
  *         name:
  *           type: string
  *         email:
  *           type: string
  *         message:
  *           type: string
+ *       example:
+ *        name: "kamana angle"
+ *        email: "kama@gmail.com"
+ *        message: "Hello!"
+ *        date: "12/2/2022"
+ *        Time: "10:30:32"
+
+
  */
 /**
  * @openapi
  * components:
  *   schemas:
  *     blogComment:
- *       type: object
+ *       type: string
  *       required:
+ *         - date
+ *         - Time
  *         - Names
  *         - Comment
+ *         - blog_Id
  *       properties:
+ *         date:
+ *           type: string
+ *           description: The date of the comment
+ *         Time:
+ *           type: string
+ *           description: The time of the comment
  *         Names:
  *           type: string
  *           description: The name of the user who created the comment
  *         Comment:
  *           type: string
- *           description: The content of the comment
- *         blog_id:
+ *           description: The text of the comment
+ *         blog_Id:
  *           type: string
  *           description: The unique id of the blog that the comment belongs to
- *         user_id:
+ *         user_Id:
  *           type: string
  *           description: The unique id of the user who created the comment
  *       example:
+ *        date: "12/2/2022"
+ *        Time: "10:30:32"
  *        Names: "John Smith"
  *        Comment: "This is a great blog post!"
+ *        blog_Id: "5f8ab6c1a6b3d6c3f6b8a6c2"
+ *        user_Id: "5f8ab6c1a6b3d6c3f6b8a6c1"
  */
 /**
  * @openapi

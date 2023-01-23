@@ -58,7 +58,6 @@ module.exports.adminRegister = async (req, res) => {
 
     try {
         const admin = await AdminSchema.create({ email, password })
-
         //console.log(admin)
 
         res.status(200).json({ "statusCode": 200, "message": 'Admin is now registred successfully' })
@@ -76,10 +75,10 @@ module.exports.adminRegister = async (req, res) => {
 
 //User registration
 module.exports.userRegister = async (req, res) => {
-    const { email, password } = req.body
+    const { firstName, secondName, phone, email, password } = req.body
 
     try {
-        const user = await UserSchema.create({ email, password })
+        const user = await UserSchema.create({ firstName, secondName, phone, email, password })
 
         //console.log(user)
 
@@ -122,16 +121,14 @@ module.exports.home = async (req, res) => {
 //login a user 
 module.exports.Userlogin_post = async (req, res) => {
     const { email, password } = req.body
-
     //console.log(email, password )
-
     try {
         const user = await UserSchema.login(email, password)
 
         const token = createUserToken(user._id)
         res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 })
 
-        return res.status(200).json({ "statusCode": 200, "message": 'user succesful login', user: email, })
+        return res.status(200).json({ "statusCode": 200, "message": 'user succesful login', "Id_user": user._id, user: email, userToken: token })
     }
     catch (err) {
         const errors = handleErrors(err)
@@ -145,6 +142,7 @@ module.exports.Adminlogin_post = async (req, res) => {
 
     // console.log(email, password)
 
+    
 
     try {
         const admin = await AdminSchema.login(email, password)
@@ -152,7 +150,7 @@ module.exports.Adminlogin_post = async (req, res) => {
         const token = createAdminToken(admin._id)
         res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000 })
 
-        return res.status(200).json({ "statusCode": 200, "message": 'Admin is succesful login' })
+        return res.status(200).json({ "statusCode": 200, "message": 'Admin is succesful login', adminToken: token })
     }
 
     catch (err) {
@@ -244,8 +242,10 @@ module.exports.createBlog = async (req, res) => {
     try {
         const blog = new BlogsSchema({
             title: req.body.title,
-            content: req.body.content,
-            imageUlr: req.body.imageUlr
+            author: req.body.author,
+            text: req.body.text,
+            image: req.body.image,
+            Time: req.body.Time
         })
         await blog.save()
         res.status(201).json({ "statusCode": 201, "message": "Blog Created successfully" })
@@ -264,9 +264,11 @@ module.exports.updateBlog = async (req, res) => {
         if (req.body.title) {
             blog.title = req.body.title;
         }
-
-        if (req.body.content) {
-            blog.content = req.body.content
+        if (req.body.author) {
+            blog.author = req.body.author
+        }
+        if (req.body.text) {
+            blog.text = req.body.text
         }
 
         await blog.save()
@@ -321,133 +323,202 @@ module.exports.createComment = async (req, res) => {
             data: {}
         });
     }
-    await BlogsSchema.findById(req.params.blog_id).then(async (blog) => {
-        console.log(req.params)
-        console.log(req.body)
-        if (!blog) {
-            return res.status(400).send({
-                message: "No Blog found",
-                data: {}
-            });
-
-        } else {
-            try {
-                // Code to create a new comment and save it to the database here
-                let comment = new BlogComment({
-                    Names: req.body.Names,
-                    Comment: req.body.Comment,
-                    blog_id: blog_id
-                    // Set properties for the new comment here
-                });
-                console.log(comment)
-                let commentData = await comment.save();
-
-                let newOne = await BlogsSchema.findById(
-                    req.params.blog_id,
-                )
-
-                newOne.blog_comments.push(commentData)
-                await newOne.save();
-
-                return res.status(200).send({
-                    message: "Comment successfully added",
-                    data: commentData
-                });
-            } catch (error) {
+    await BlogsSchema.findById(req.params.blog_id)
+        .then(async (blog) => {
+            console.log(req.params)
+            console.log(req.body)
+            if (!blog) {
                 return res.status(400).send({
-                    message: error.message,
-                    data: error
+                    message: "No Blog found",
+                    data: {}
                 });
+
+            } else {
+                let blogName;
+                if (blog) {
+                    blogName = blog.title
+                    console.log(blogName)
+                }
+                try {
+                    console.log(blogName)
+
+                    // Code to create a new comment and save it to the database here
+                    let comment = new BlogComment({
+                        blogName: blogName,
+                        date: req.body.date,
+                        Time: req.body.Time,
+                        Names: req.body.Names,
+                        Comment: req.body.Comment,
+                        blog_id: blog_id
+                        // Set properties for the new comment here
+                    });
+                    console.log(comment)
+                    let commentData = await comment.save();
+
+                    let newOne = await BlogsSchema.findById(
+                        req.params.blog_id,
+                    )
+
+                    newOne.blog_comments.push(commentData)
+                    await newOne.save();
+
+                    return res.status(200).send({
+                        message: "Comment successfully added",
+                        data: commentData
+                    });
+                } catch (error) {
+                    return res.status(400).send({
+                        message: error.message,
+                        data: error
+                    });
+                }
+
             }
 
-        }
-    }).catch((err) => {
-        return res.status(400).send({
-            message: err.message,
-            data: err
+        }).catch((err) => {
+            return res.status(400).send({
+                message: err.message,
+                data: err
+            });
         });
-    });
 };
+/// to get all comments
+module.exports.getAllCommetsofAllBlogs = (req, res) => {
+    BlogComment.find({}, (err, message) => {
+        if (err) {
+            res.status(500).send(err);
+        } else {
+            res.status(200).send(message);
+        }
+    })
+}
+
+module.exports.getBlogComments = async (req, res) => {
+    let blog_id = req.params[0];
+
+    if (!mongoose.Types.ObjectId.isValid(req.params.blog_id)) {
+        return res.status(400).send({
+            message: "Invalid blog id",
+            data: {}
+        });
+    }
+    try {
+        const blog = await BlogsSchema.findOne({
+            _id: req.params.blog_id
+        })
+        res.json({ "statusCode": 200, "message": "Successful", "comments": blog.blog_comments })
+    } catch (error) {
+        res.status(404)
+        res.json({
+            error: error.message
+        })
+    }
+}
 
 /////// like and Unlike a blog
 
 /////// LIKE a blog
 module.exports.like = async (req, res) => {
     let blog_id = req.params.blog_id;
-  
+
     // Validate the blog id
     if (!mongoose.Types.ObjectId.isValid(blog_id)) {
-      return res.status(400).send({
-        message: "Invailable blog id",
-        data: {}
-      });
-    }
-  
-    try {
-      // Find the blog using the id
-      const blog = await BlogsSchema.findOne({ _id: blog_id });
-      if (!blog) {
         return res.status(400).send({
-          message: "No Blog found",
-          data: {}
+            message: "Invailable blog id",
+            data: {}
         });
-      }
-  
-      // Get the current user from the request
-      const current_user = req.user;
-  
-      // Find the like for the current user and blog
-      const blog_like = await BlogLike.findOne({
-        blog_id: blog_id,
-        user_id: current_user._id // to get current user id
-      });
-  
-      if (!blog_like) {
-        // If there is no like, create a new one
-        const blogLikeDoc = new BlogLike({
-          blog_id: blog_id,
-          user_id: current_user._id
-        });
-        const likeData = await blogLikeDoc.save();
-  
-        // Add the like to the blog's list of likes
-        await BlogsSchema.updateOne(
-          { _id: blog_id },
-          { $push: { likes: likeData._id } }
-        );
-  
-        // Return a success message and the like data
-        return res.status(200).send({
-          message: "Like successfully added",
-          data: likeData
-        });
-      } else {
-        // If there is already a like, delete it
-        await BlogLike.deleteOne({ _id: blog_like._id });
-        // Remove the like from the blog's list of likes
-        await BlogsSchema.updateOne(
-          { _id: blog_id },
-          { $pull: { likes: blog_like._id } }
-        );
-
-        // Return a success message and the like data
-        return res.status(200).send({
-          message: "Like successfully removed",
-          data: blog_like
-        });
-      }
-    } catch (err) {
-      console.log(err);
-      // If there is an error, return it with a status of 400
-      return res.status(400).send({
-        message: err.message,
-        data: err
-      });
     }
-  };
-  
-  
-  
+
+    try {
+        // Find the blog using the id
+        const blog = await BlogsSchema.findOne({ _id: blog_id });
+        if (!blog) {
+            return res.status(400).send({
+                message: "No Blog found",
+                data: {}
+            });
+        }
+
+        // Get the current user from the request
+        const current_user = req.user;
+        console.log(current_user)
+        // Find the like for the current user and blog
+        const blog_like = await BlogLike.findOne({
+            blog_Id: blog_id,
+            user_Id: current_user._id // to get current user id
+
+        });
+        console.log(blog_like)
+
+        if (!blog_like) {
+            // If there is no like, create a new one
+            const blogLikeDoc = new BlogLike({
+                blog_Id: blog_id,
+                user_Id: current_user._id
+            });
+            const likeData = await blogLikeDoc.save();
+
+            // Add the like to the blog's list of likes
+            await BlogsSchema.updateOne(
+                { _id: blog_id },
+                { $push: { likes: likeData._id } }
+            );
+
+            // Return a success message and the like data
+            return res.status(200).send({
+                message: "Like successfully added",
+                data: likeData
+            });
+        } else {
+            // If there is already a like, delete it
+            await BlogLike.deleteOne({ _id: blog_like._id });
+            // Remove the like from the blog's list of likes
+            await BlogsSchema.updateOne(
+                { _id: blog_id },
+                { $pull: { likes: blog_like._id } }
+            );
+
+            // Return a success message and the like data
+            return res.status(200).send({
+                message: "Like successfully removed",
+                data: blog_like
+            });
+        }
+    } catch (err) {
+        console.log(err);
+        // If there is an error, return it with a status of 400
+        return res.status(400).send({
+            message: err.message,
+            data: err
+        });
+    }
+};
+module.exports.getBloglikes = async (req, res) => {
+    let blog_id = req.params;
+    console.log(req.params)
+    if (!mongoose.Types.ObjectId.isValid(req.params.blog_id)) {
+        return res.status(400).send({
+            message: "Invalid blog id",
+            data: {}
+        });
+    }
+    try {
+        const blog = await BlogsSchema.findOne({
+            _id: req.params.blog_id
+        })
+        mem = blog.likes
+        res.json({ "statusCode": 200, "message": "Successful this is likes", "People_likes": mem, "number": mem.length })
+    } catch (error) {
+        res.status(404)
+
+        res.json({
+            error: error.message
+        })
+    }
+}
+
+
+
 
 
 
@@ -459,6 +530,14 @@ module.exports.like = async (req, res) => {
 
 /////// user messages
 const Message = mongoose.model('Message', {
+    date: {
+        type: String,
+
+    },
+
+    Time: {
+        type: String,
+    },
     name: {
         type: String,
         required: [true, 'Please enter your names'],
@@ -485,17 +564,32 @@ module.exports.getMessage = (req, res) => {
 //post a message (user)
 module.exports.postMessage = (req, res) => {
     const newMessage = new Message({
+        date: req.body.date,
+        Time: req.body.Time,
         name: req.body.name,
         email: req.body.email,
-        message: req.body.message
+        message: req.body.message,
     })
     newMessage.save((err, message) => {
         if (err) {
-            res.status(500).send(err)
+            res.status(500).json(err)
         } else {
-            res.status(201).send({ message: "your message send succesfull" })
+            res.status(201).send({ message: "message send" })
         }
     })
+}
+module.exports.deleteMessage = async (req, res) => {
+    try {
+        await Message.deleteOne({
+            _id: req.params.id
+        })
+        res.status(200).json({ "statusCode": 200, "message": "message Deleted Successfully" })
+    } catch (error) {
+        res.status(400)
+        res.json({
+            error: error.message
+        })
+    }
 }
 
 
@@ -507,17 +601,28 @@ const Subscribe = mongoose.model('Subscribe', {
         required: [true, 'Please enter your email'],
         unique: true
     },
+    Time: {
+        type: String
+    },
+    date: {
+        type: String
+    }
 });
 
 module.exports.postSubscribe = async (req, res) => {
+    // Get the current user from the request
+
     try {
         const newSubscribe = new Subscribe({
-            email: req.body.email
+            email: req.body.email,
+            Time: req.body.Time,
+            date: req.body.date
         })
 
         let subscribed = await Subscribe.findOne({ email: newSubscribe.email });
         if (subscribed) {
-            res.send("Email already subscribed");
+            let email = newSubscribe.email
+            res.send({ message: `${email} already subscribed` });
         } else {
             newSubscribe.save((err, message) => {
                 if (err) {
@@ -543,6 +648,21 @@ module.exports.getSubscribe = (req, res) => {
             res.status(200).send(message);
         }
     })
+}
+module.exports.deleteOneSubscribers = async (req, res) => {
+    console.log("hellooolol")
+    try {
+        await Subscribe.deleteOne({
+            _id: req.params.id,
+
+        })
+        res.status(200).json({ "statusCode": 200, "message": "Deleted" })
+    } catch (error) {
+        res.status(400)
+        res.json({
+            error: error.message
+        })
+    }
 }
 module.exports.deleteAllSubscribers = (req, res) => {
     Subscribe.deleteMany({}, (err) => {

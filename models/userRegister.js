@@ -4,6 +4,21 @@ const bcrypt = require('bcrypt')
 
 //user schema
 const userSchema = mongoose.Schema({
+    firstName:{
+   type:String,
+   required: [true, 'Please enter the first name']
+    },
+    secondName:{
+        type:String,
+        required: [true, 'Please enter the Second name']
+    },
+
+    phone:{
+        type: String,
+        match: /^[0-9]{10}$/,
+        required: [true, 'Please enter the Phone number']
+
+      },
     email: {
         type: String,
         required: [true, 'Please enter the email'],

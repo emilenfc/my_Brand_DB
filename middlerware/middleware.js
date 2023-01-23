@@ -3,14 +3,20 @@ const UserSchema = require('../models/userRegister')
 
 const requireAuth = (req, res, next) => {
     //console.log(req)
-    const token = req.cookies.jwt
-    // console.log("My admin tokeen is" + token)
+    const { authorization } = req.headers;
+    if (!authorization) {
+        return res.status(401).json({ "statusCode": 401, "message": "Please Login" })
+    }
+  const token = authorization.split(" ")[1];
+    console.log("My admin tokeen is" + token)
     // this will check json web token exists & verified
     if (token) {
         jwt.verify(token, 'thisismysecreteonlytoadmin', (err, decodedToken) => {
             if (err) {
                 // console.log(err.message)
-                return res.status(401).json("Please This is for admin only!!!!")
+                return res.status(401).json("Please This is for admin only").redirect('/')
+                
+
                 //{ "statusCode": 401, "message": "This is for admin only!!!!" }
             } else {
                 //res.redirect('/adminDashboard')
@@ -33,14 +39,20 @@ const checkUser = (req, res, next) => {
 
     // console.log("my tokeen is " +req.cookies.jwt)
 
-    const token = req.cookies.jwt
+    const { authorization } = req.headers;
+    if (!authorization) {
+        return res.status(401).json({ "statusCode": 401, "message": "Please Login" })
+    }
+
+  const token = authorization.split(" ")[1];
 
     if (token) {
         jwt.verify(token, 'thisismysecreteonlytousers', async (err, decodedToken) => {
+           
             if (err) {
                 // console.log(err.message)
                 res.locals.user = null;
-                res.redirect('/')
+                res.send({message:"login first"})
                 //next()
             } else {
                 // console.log(decodedToken)

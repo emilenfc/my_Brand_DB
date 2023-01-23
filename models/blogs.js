@@ -9,17 +9,25 @@ const blogsSchema = mongoose.Schema({
         required: [true, 'Please enter a blog title'],
         unique: true,
     },
-    content: {
+    author: {
         type: String,
-        required: [true, 'Please enter a blog content'],
+        required: [true, 'Please enter Author'],
+    },
+    text: {
+        type: String,
+        required: [true, 'Please enter a blog text'],
         unique: true,
     },
-    imageUlr: {
+    image: {
         type: [String, 'Pleade enter background image url'],
-        required: [true, 'Please enter a blog content'],
-        unique: true,
+        required: [true, 'Please enter a blog image'],
+    },
+    Time :{
+        type: [String, 'Pleade enter background image url'],
     },
     blog_comments: [{ 
+        Time: String,
+        date: String,
         Names: String,
         Comment: String
     }],

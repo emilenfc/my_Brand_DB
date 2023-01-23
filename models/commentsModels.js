@@ -2,6 +2,17 @@ const { urlencoded } = require("express")
 const mongoose = require("mongoose")
 
 const commentSchema = mongoose.Schema({
+    blogName:{
+        type:String
+    },
+    date:{
+        type:String,
+        required: [true, 'Please enter date'],
+    },
+    Time:{
+        type:String,
+        required: [true, 'Please enter Time'],
+    },
 Names:{
         type:String,
         required: [true, 'Please enter your name'],

@@ -8,11 +8,7 @@ blog_Id:{
 user_Id:{
     type: mongoose.Schema.Types.ObjectId, ref:'User'},
 }
-,
-{  
-timestamps: true,
-    
-});
+);
 
 const BlogLike = mongoose.model('BlogLike', likeSchema)
 module.exports =  BlogLike;
