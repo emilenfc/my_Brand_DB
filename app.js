@@ -41,8 +41,8 @@ const options = {
 		],
 		servers: [
 			{
-				// url:"https://good-red-cougar-hem.cyclic.app"
-				url: "http://localhost:4000"
+				url:"https://good-red-cougar-hem.cyclic.app"
+				//url: "http://localhost:4000"
 			}
 		],
 
