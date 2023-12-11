@@ -1,2 +1,2 @@
 # my_Brand_DB
-this is database of myBrand
+this is backend REST APIs of my brand
